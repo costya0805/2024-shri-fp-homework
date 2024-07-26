@@ -13,6 +13,7 @@
  * Если какие либо функции написаны руками (без использования библиотек) это не является ошибкой
  */
 import { conforms, every, values, countBy } from "lodash";
+import { compose, filter, map } from "ramda";
 
 const isWhite = (value) => value === "white";
 const isOrange = (value) => value === "orange";
@@ -64,10 +65,16 @@ export const validateFieldN4 = (shapes) => {
 
 // 5. Три фигуры одного любого цвета кроме белого (четыре фигуры одного цвета – это тоже true).
 export const validateFieldN5 = (shapes) => {
-    return Object.entries(colorsCount(shapes))
-        .filter((i) => i[0] !== "white")
-        .map((i) => i[1])
-        .filter((i) => i >= 3).length;
+    const getLength = (val) => !!val.length;
+    const some = compose(
+        getLength,
+        filter((i) => i >= 3),
+        map((i) => i[1]),
+        filter((i) => i[0] !== "white"),
+        Object.entries,
+        colorsCount
+    );
+    return some(shapes);
 };
 
 // 6. Ровно две зеленые фигуры (одна из зелёных – это треугольник), плюс одна красная. Четвёртая оставшаяся любого доступного цвета, но не нарушающая первые два условия
